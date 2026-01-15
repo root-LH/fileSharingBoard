@@ -6,10 +6,15 @@
 </head>
 <body>
     <h2>File Upload</h2>
-    <form action="/upload" method="post" enctype="multipart/form-data">
-        <input type="file" name="file">
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" name="file", id="fileInput">
         <button type="submit">Upload</button>
     </form>
+    <br><br>
+    <progress id="progressBar" value="0" max="100" style="width:300px;"></progress>
+    <span id="progressText">0%</span>
+
+    <script src="/static/upload.js"></script>
 
     <h2>Files</h2>
     <ul>

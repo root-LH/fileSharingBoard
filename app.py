@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory
+from werkzeug.utils import secure_filename
 import os
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -7,6 +8,7 @@ UPLOAD_DIR = os.path.join(APP_DIR, "files")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 * 1024
 
 @app.route("/")
 def index():
@@ -22,7 +24,8 @@ def upload():
     if (f.filename == ""):
         return redirect(url_for("index"))
     
-    save_path = os.path.join(UPLOAD_DIR, f.filename)
+    filename = secure_filename(f.filename)
+    save_path = os.path.join(UPLOAD_DIR, filename)
     f.save(save_path)
     return redirect(url_for("index"))
 
