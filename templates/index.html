@@ -17,13 +17,25 @@
     <script src="/static/upload.js"></script>
 
     <h2>Files</h2>
-    <ul>
+    <table>
+    <thead>
+        <tr>
+            <th>filename</th>
+            <th>size</th>
+            <th>download</th>
+        </tr>
+    </thead>
+    <tbody>
         {% for f in files %}
-            <li>
-                {{ f }}
-                <a href="/download/{{ f }}">download</a>
-            </li>
+        <tr>
+            <td>{{ f.name }}</td>
+            <td>{{ f.size }}</td>
+            <td>
+                <a href="{{ url_for('download', filename=f.name) }}">download</a>
+            </td>
+        </tr>
         {% endfor %}
-    </ul>
+    </tbody>
+</table>
 </body>
 </html>

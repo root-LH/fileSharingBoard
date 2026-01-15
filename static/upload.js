@@ -12,9 +12,9 @@ document.getElementById("uploadForm").addEventListener("submit", function (e) {
 
     xhr.upload.onprogress = function (e) {
         if (e.lengthComputable) {
-            const percent = Math.round((e.loaded / e.total) * 100);
+            const percent = Math.round((e.loaded / e.total * 100).toFixed(1));
             document.getElementById("progressBar").value = percent;
-            document.getElementById("progressText").innerText = percent + "%";
+            document.getElementById("progressText").innerText = `${percent}% (${(e.loaded/1024/1024).toFixed(1)} / ${(e.total/1024/1024).toFixed(1)} MB)`;
         }
     };
 
