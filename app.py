@@ -24,7 +24,7 @@ def upload():
     if (f.filename == ""):
         return redirect(url_for("index"))
     
-    filename = secure_filename(f.filename)
+    filename = os.path.basename(f.filename)
     save_path = os.path.join(UPLOAD_DIR, filename)
     f.save(save_path)
     return redirect(url_for("index"))
