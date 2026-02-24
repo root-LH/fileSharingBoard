@@ -1,6 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
 import os
+import configparser
+
+config = configparser.ConfigParser()
+config.read('config.ini', encoding='utf-8')
+
+CERT_FILE = config['SSL']['cert_path']
+KEY_FILE = config['SSL']['key_path']
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_DIR = os.path.join(APP_DIR, "files")
@@ -41,7 +48,7 @@ def upload():
     if (f.filename == ""):
         return redirect(url_for("index"))
     
-    filename = os.path.basename(f.filename)
+    filename = secure_filename(f.filename)
     save_path = os.path.join(UPLOAD_DIR, filename)
     f.save(save_path)
     return redirect(url_for("index"))
@@ -51,4 +58,4 @@ def download(filename):
     return send_from_directory(UPLOAD_DIR, filename, as_attachment=True)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=9000)
+    app.run(host="0.0.0.0", port=443, ssl_context=(CERT_FILE, KEY_FILE))
