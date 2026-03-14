@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory, session
 from werkzeug.utils import secure_filename
 import os
 import configparser
@@ -8,6 +8,7 @@ config.read('config.ini', encoding='utf-8')
 
 CERT_FILE = config['SSL']['cert_path']
 KEY_FILE = config['SSL']['key_path']
+ACCESS_PASSWORD = config['SECURITY']['password']
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_DIR = os.path.join(APP_DIR, "files")
@@ -15,7 +16,38 @@ UPLOAD_DIR = os.path.join(APP_DIR, "files")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 app = Flask(__name__)
+app.secret_key = config['SECURITY']['secret_key']
 app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 * 1024
+
+@app.before_request
+def check_login():
+    if request.endpoint in ['login', 'static']:
+        return
+
+    if not session.get('authenticated'):
+        return redirect(url_for('login'))
+    
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        input_password = request.form.get("password")
+        if input_password == ACCESS_PASSWORD:
+            session['authenticated'] = True
+            return redirect(url_for('index'))
+        else:
+            return "password is incorrect.", 403
+    return '''
+        <form method="post">
+            <h2>Please enter a password for access</h2>
+            <input type="password" name="password">
+            <input type="submit" value="login">
+        </form>
+    '''
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
 
 def format_size(size):
     for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
