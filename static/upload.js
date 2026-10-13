@@ -4,12 +4,16 @@ document.getElementById("uploadForm").addEventListener("submit", function (e) {
     const fileInput = document.getElementById("fileInput");
     if (!fileInput.files.length) return;
 
+    const currentPathInput = document.getElementById("currentPathInput");
+    const currentPath = currentPathInput ? currentPathInput.value : "";
+
     const speedText = document.getElementById("speedText");
     const progressBar = document.getElementById("progressBar");
     const progressContainer = document.querySelector(".progress");
 
     const formData = new FormData();
     formData.append("file", fileInput.files[0]);
+    formData.append("current_path", currentPath);
 
     const xhr = new XMLHttpRequest();
     xhr.open("POST", "/upload", true);
@@ -44,9 +48,15 @@ document.getElementById("uploadForm").addEventListener("submit", function (e) {
 
     xhr.onload = function () {
         if (xhr.status === 200) {
-            document.getElementById("progressText").innerText = "완료";
+            document.getElementById("progressText").innerText = "Completed";
             setTimeout(() => location.reload(), 1000);
+        } else {
+            document.getElementById("progressText").innerText = "Upload failed (" + xhr.status + ")";
         }
+    };
+
+    xhr.onerror = function () {
+        document.getElementById("progressText").innerText = "An error occurred during upload.";
     };
 
     xhr.send(formData);
